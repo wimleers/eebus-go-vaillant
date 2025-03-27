@@ -228,7 +228,7 @@ func (h *controlbox) run() {
 	deviceBrand := "Demo"
 	deviceModel := "ControlBox"
 	serialNumber := "123456789"
-	altIdentifier := "ControlBox Simulator SN-" + serialNumber
+	altIdentifier := "Demo-ControlBox-" + serialNumber
 
 	h.isConnected = map[string]bool{}
 
