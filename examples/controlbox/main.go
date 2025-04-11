@@ -209,6 +209,9 @@ func (h *controlbox) run() {
 			Bytes: certificate.Certificate[0],
 		})
 		fmt.Println(string(pemdata))
+		if _, err := os.Stat("cb.cert"); os.IsNotExist(err) {
+			os.WriteFile("cb.cert", pemdata, 0644)
+		}
 
 		b, err := x509.MarshalECPrivateKey(certificate.PrivateKey.(*ecdsa.PrivateKey))
 		if err != nil {
@@ -216,6 +219,9 @@ func (h *controlbox) run() {
 		}
 		pemdata = pem.EncodeToMemory(&pem.Block{Type: "EC PRIVATE KEY", Bytes: b})
 		fmt.Println(string(pemdata))
+		if _, err := os.Stat("cb.key"); os.IsNotExist(err) {
+			os.WriteFile("cb.key", pemdata, 0644)
+		}
 	}
 
 	port, err := strconv.Atoi(os.Args[1])
