@@ -1,0 +1,1 @@
+go run . 4712 cb.cert cb.key
