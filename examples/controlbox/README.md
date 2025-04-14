@@ -1,5 +1,71 @@
-# Vue 3 + TypeScript + Vite
+# Vaillant Leistungsreduzierung gemäß § 14a EnWG
+Dieses Projekt demonstriert die Leistungsreduzierung von Vaillant Wärmepumpen gemäß § 14a EnWG. Vaillant implementiert dafür die EEBUS LPC (Limit Power Consumption) Schnittstelle.
 
-This template should help get you started developing with Vue 3 and TypeScript in Vite. The template uses Vue 3 `<script setup>` SFCs, check out the [script setup docs](https://v3.vuejs.org/api/sfc-script-setup.html#sfc-script-setup) to learn more.
+Für das Auslösen des EEBUS LPC Kommandos wird ein FNN-Steuerbox-Simulator verwendet, der auf der plattformunabhängigen eebus-go Implementierung basiert und somit auf Windows, Linux und Mac Computern lauffähig ist.
 
-Learn more about the recommended Project Setup and IDE Support in the [Vue Docs TypeScript Guide](https://vuejs.org/guide/typescript/overview.html#project-setup).
+Für Windows liegen Batch-Skripte für die Installation sowie Ausführung bei. Analog dazu sind in dieser Anleitung die plattformunabhängigen Kommandozeilen-Anweisungen beigefügt.
+## Voraussetzungen
+### Vaillant Wärmepumpensystem
+* Wärmepumpe: aroTHERM split/plus/split plus, versoTHERM, recoCOMPACT
+* FW: 0351.09.01 oder neuer
+* Internetmodul: VR 920/921/940f
+* Steuerung: sensoCOMFORT VRC 720, multiMATIC VRC 700f/4 u. 700/6
+* App: myVAILLANT
+
+### FNN-Steuerbox-Simulator
+* [Go](https://go.dev/dl/)
+* [Node.js](https://nodejs.org/en/download)
+## FNN-Steuerbox-Simulator
+### Installation
+```
+cb-eebus-firstrun.bat
+```
+bzw.
+```
+go run . 4712
+```
+
+Ein Zertifikat/Schlüssel-Paar für die sichere Verbindung wird erstellt.
+
+### Starten
+```
+cb-eebus-run.bat
+```
+bzw.
+```
+go run . 4712 cb.cert cb.key
+```
+
+### Verbinden mit Vaillant
+![image](https://github.com/user-attachments/assets/a48b12f2-2291-4149-b1a5-2bd977f684f7) ![image](https://github.com/user-attachments/assets/c2890de7-fc15-43c1-b690-469acae7b29b)
+
+
+## Web-Frontend
+### Installation
+```
+cb-vite-install.bat
+```
+bzw.
+```
+npm install
+```
+
+### Server starten
+```
+cb-vite-run.bat
+```
+bzw.
+```
+npm run dev
+```
+
+### Web-Interface aufrufen
+```
+cb-webui.url
+```
+bzw.
+```
+http://localhost:7081/
+```
+## EEBUS LPC & MPC
+![image](https://github.com/user-attachments/assets/2b43e2eb-a14b-419d-8f58-58d26e631fcc) ![image](https://github.com/user-attachments/assets/07309cec-99d4-41ac-9cea-63f637781273)
