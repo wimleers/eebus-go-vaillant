@@ -68,4 +68,4 @@ bzw.
 http://localhost:7081/
 ```
 ## EEBUS LPC & MPC
-![image](https://github.com/user-attachments/assets/2b43e2eb-a14b-419d-8f58-58d26e631fcc) ![image](https://github.com/user-attachments/assets/07309cec-99d4-41ac-9cea-63f637781273)
+![image](https://github.com/user-attachments/assets/3c66d4f5-531b-4cc2-a3b1-a81ff592d9eb) ![image](https://github.com/user-attachments/assets/e76e8ace-fd90-41c1-b566-c9822afe9149)
