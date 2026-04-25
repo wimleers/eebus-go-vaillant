@@ -7,6 +7,7 @@ toolchain go1.23.4
 require (
 	github.com/enbility/ship-go v0.0.0-20241118145930-d68708c5f1c0
 	github.com/enbility/spine-go v0.0.0-20241209160856-1aed917e83e7
+	github.com/gorilla/websocket v1.5.3
 	github.com/stretchr/testify v1.9.0
 	golang.org/x/exp/jsonrpc2 v0.0.0-20240909161429-701f63a606c0
 )
@@ -18,7 +19,6 @@ require (
 	github.com/enbility/zeroconf/v2 v2.0.0-20240920094356-be1cae74fda6 // indirect
 	github.com/godbus/dbus/v5 v5.1.0 // indirect
 	github.com/golanguzb70/lrucache v1.2.0 // indirect
-	github.com/gorilla/websocket v1.5.3 // indirect
 	github.com/miekg/dns v1.1.62 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
 	github.com/rickb777/date v1.21.1 // indirect
@@ -26,7 +26,6 @@ require (
 	github.com/stretchr/objx v0.5.2 // indirect
 	gitlab.com/c0b/go-ordered-json v0.0.0-20201030195603-febf46534d5a // indirect
 	go.uber.org/mock v0.4.0 // indirect
-	golang.org/x/exp v0.0.0-20250218142911-aa4b98e5adaa // indirect
 	golang.org/x/exp/event v0.0.0-20220217172124-1812c5b45e43 // indirect
 	golang.org/x/mod v0.23.0 // indirect
 	golang.org/x/net v0.35.0 // indirect

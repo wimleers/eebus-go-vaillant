@@ -7,9 +7,11 @@ import (
 	"slices"
 	"time"
 
+	"github.com/enbility/eebus-go/features/client"
 	ucapi "github.com/enbility/eebus-go/usecases/api"
 	shipapi "github.com/enbility/ship-go/api"
 	spineapi "github.com/enbility/spine-go/api"
+	"github.com/enbility/spine-go/model"
 	"github.com/gorilla/websocket"
 )
 
@@ -57,6 +59,7 @@ const (
 	GetCurrentPerPhase             = 34
 	GetVoltagePerPhase             = 35
 	GetFrequency                   = 36
+	GetRawMPCData                  = 37
 )
 
 type RemoteInfo struct {
@@ -89,6 +92,7 @@ type Message struct {
 	EntityInfos  []EntityInfo
 	UseCaseInfos map[string][]UseCaseInfo
 	UseCase      string
+	RawData      string
 }
 
 func readData(h *controlbox, entity spineapi.EntityRemoteInterface, ucs []string) {
@@ -151,6 +155,10 @@ func readData(h *controlbox, entity spineapi.EntityRemoteInterface, ucs []string
 			frontend.sendValue(ski, GetProductionNominalMax, "LPP", nominal)
 		}
 	}
+
+	if ucs == nil || slices.Contains(ucs, "MPC") {
+		sendRawMPCData(h, entity, ski)
+	}
 }
 
 func sendData(h *controlbox, ski string, uc string) {
@@ -178,9 +186,62 @@ func sendData(h *controlbox, ski string, uc string) {
 
 		frontend.sendValue(ski, GetProductionFailsafeDuration, "LPP", float64(h.productionFailsafeLimits.Duration/time.Second))
 
+	case "MPC":
+		info, exists := h.remoteInfos[ski]
+		if exists && info.Device != nil {
+			for _, entity := range info.Device.Entities() {
+				sendRawMPCData(h, entity, ski)
+			}
+		}
+
 	default:
 		return
 	}
+}
+
+// MPCRawData holds all raw SPINE data retrieved from a remote entity for the MPC use case.
+type MPCRawData struct {
+	MeasurementDescriptions      []model.MeasurementDescriptionDataType                        `json:"measurementDescriptions,omitempty"`
+	MeasurementData              []model.MeasurementDataType                                   `json:"measurementData,omitempty"`
+	ElectricalConnectionDescs    []model.ElectricalConnectionDescriptionDataType                `json:"electricalConnectionDescriptions,omitempty"`
+	ElectricalConnectionParams   []model.ElectricalConnectionParameterDescriptionDataType       `json:"electricalConnectionParameterDescriptions,omitempty"`
+}
+
+// sendRawMPCData collects all available measurement and electrical-connection data from
+// the given remote entity and sends it to the frontend as a JSON-encoded raw blob.
+func sendRawMPCData(h *controlbox, entity spineapi.EntityRemoteInterface, ski string) {
+	raw := MPCRawData{}
+
+	if measurement, err := client.NewMeasurement(h.myService.LocalDevice().EntityForType(model.EntityTypeTypeGridGuard), entity); err == nil {
+		if descs, err := measurement.GetDescriptionsForFilter(model.MeasurementDescriptionDataType{}); err == nil {
+			raw.MeasurementDescriptions = descs
+		}
+		if data, err := measurement.GetDataForFilter(model.MeasurementDescriptionDataType{}); err == nil {
+			raw.MeasurementData = data
+		}
+	}
+
+	if ec, err := client.NewElectricalConnection(h.myService.LocalDevice().EntityForType(model.EntityTypeTypeGridGuard), entity); err == nil {
+		if descs, err := ec.GetDescriptionsForFilter(model.ElectricalConnectionDescriptionDataType{}); err == nil {
+			raw.ElectricalConnectionDescs = descs
+		}
+		if params, err := ec.GetParameterDescriptionsForFilter(model.ElectricalConnectionParameterDescriptionDataType{}); err == nil {
+			raw.ElectricalConnectionParams = params
+		}
+	}
+
+	jsonBytes, err := json.Marshal(raw)
+	if err != nil {
+		return
+	}
+
+	answer := Message{
+		SKI:     ski,
+		Type:    GetRawMPCData,
+		UseCase: "MPC",
+		RawData: string(jsonBytes),
+	}
+	frontend.sendMessage(answer)
 }
 
 var upgrader = websocket.Upgrader{

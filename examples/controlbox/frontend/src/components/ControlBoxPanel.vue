@@ -181,6 +181,10 @@
           <label>Frequency:</label>
           <label>{{ selectedMs['MPC'].Frequency ?? 0 }} Hz</label>
         </div>
+        <div v-if="rawMpcData[selectedSki]">
+          <h4>Raw SPINE Data (JSON)</h4>
+          <pre class="raw-data">{{ rawMpcDataJson }}</pre>
+        </div>
       </div>
 
     </div>
@@ -229,7 +233,8 @@
 	  GetEnergyConsumed              = 33,
 	  GetCurrentPerPhase             = 34,
 	  GetVoltagePerPhase             = 35,
-	  GetFrequency                   = 36
+	  GetFrequency                   = 36,
+	  GetRawMPCData                  = 37
 }
 
   interface Limits {
@@ -287,7 +292,8 @@
     ServiceList?:  RemoteService[],
     EntityInfos?:  EntityInfo[],
     UseCaseInfos?: UseCaseInfos
-    UseCase?:      string
+    UseCase?:      string,
+    RawData?:      string
   }
 
   type UCLimits       = {[key:string]:Limits};
@@ -306,6 +312,7 @@
 
     public limits: LimitData = {};
     public monitorings: MonitoringData = {};
+    public rawMpcData: {[key: string]: any} = {};
 
     public remoteServices: RemoteService[] = [];
     public useCaseInfos: UseCaseInfos = {};
@@ -333,6 +340,11 @@
 
     public get selectedMs() {
       return this.monitorings[this.selectedSki];
+    }
+
+    public get rawMpcDataJson() {
+      const data = this.rawMpcData[this.selectedSki];
+      return data ? JSON.stringify(data, null, 2) : "";
     }
 
     public get optionServices() {
@@ -611,6 +623,12 @@
         	case MessageType.GetFrequency: {
             this.updateDeviceData( message.UseCase! );
             this.monitorings[message.SKI][message.UseCase!].Frequency = message.Value ?? 0;
+            break;
+          }
+          case MessageType.GetRawMPCData: {
+            if ( message.RawData ) {
+              this.rawMpcData[message.SKI] = JSON.parse( message.RawData );
+            }
             break;
           }
         }   
@@ -913,5 +931,18 @@
   .device-select-label {
     text-align: left;
     line-height: 2.2em;
+  }
+
+  .raw-data {
+    text-align: left;
+    font-size: 0.75em;
+    background: #f4f4f4;
+    border: 1px solid #ccc;
+    padding: 8px;
+    overflow-x: auto;
+    white-space: pre-wrap;
+    word-break: break-all;
+    max-height: 400px;
+    overflow-y: auto;
   }
 </style>

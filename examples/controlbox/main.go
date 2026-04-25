@@ -684,6 +684,7 @@ func (h *controlbox) OnMPCEvent(ski string, device spineapi.DeviceRemoteInterfac
 		if power, err := h.ucmpc.Power(entity); err == nil {
 			frontend.sendValue(ski, GetPower, "MPC", power)
 		}
+		sendRawMPCData(h, entity, ski)
 	case mpc.DataUpdatePowerPerPhase:
 		if powerPerPhase, err := h.ucmpc.PowerPerPhase(entity); err == nil {
 			frontend.sendValueArr(ski, GetPowerPerPhase, "MPC", powerPerPhase)
